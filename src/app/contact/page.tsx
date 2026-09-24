@@ -2,14 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { MarketingShell } from "@/components/layout/marketing-shell";
+import { SITE_SOCIAL, SUPPORT_EMAIL } from "@/lib/site/links";
 
 export const metadata: Metadata = {
   title: "Contact",
   description: "Get in touch with the MeetCast team.",
 };
-
-/** Public support inbox — keep in sync with who actually reads mail. */
-const SUPPORT_EMAIL = "MiladJoodi1@gmail.com";
 
 export default function ContactPage() {
   return (
@@ -45,6 +43,30 @@ export default function ContactPage() {
           </p>
         </div>
 
+        <div className="space-y-3">
+          <p className="text-xs font-medium tracking-wide text-white/45 uppercase">
+            Elsewhere
+          </p>
+          <nav className="flex flex-wrap gap-4 text-sm" aria-label="Social">
+            <a
+              href={SITE_SOCIAL.github.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-white underline-offset-4 hover:underline"
+            >
+              {SITE_SOCIAL.github.label}
+            </a>
+            <a
+              href={SITE_SOCIAL.linkedin.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-white underline-offset-4 hover:underline"
+            >
+              {SITE_SOCIAL.linkedin.label}
+            </a>
+          </nav>
+        </div>
+
         <p className="text-sm text-white/50">
           Comparing limits first?{" "}
           <Link
@@ -52,6 +74,13 @@ export default function ContactPage() {
             className="font-medium text-white underline-offset-4 hover:underline"
           >
             See plans
+          </Link>
+          . Building locally?{" "}
+          <Link
+            href="/docs"
+            className="font-medium text-white underline-offset-4 hover:underline"
+          >
+            Read the docs
           </Link>
           .
         </p>

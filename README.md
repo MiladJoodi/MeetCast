@@ -1,37 +1,178 @@
 # MeetCast
 
-Reliable real-time video meetings and webinars (up to 50 participants per room).
+MeetCast is a video meeting application built with Next.js, LiveKit, PostgreSQL, and TypeScript.
 
-## Stack
+You schedule a room, share an invite, and join with camera, mic, screen share, chat, and basic moderation. Plans control participant counts and meeting duration. Private rooms restrict join to allowlisted account emails.
 
-- Next.js (App Router) + TypeScript + Tailwind + shadcn/ui
-- Neon PostgreSQL + Drizzle ORM
-- Self-hosted LiveKit (WebRTC SFU)
-- pnpm
+**Stack:** Next.js 16 · React 19 · TypeScript · Tailwind CSS 4 · Drizzle · Neon Postgres · LiveKit · Vitest · pnpm 12
 
-Authentication uses Argon2id password hashing and server-side database sessions
-(httpOnly cookies). Guests join via invite links with signed cookies. LiveKit
-handles media after **server-issued** short-lived tokens.
+In-app docs (after `pnpm dev`): open `/docs` on your local app.
 
-## Prerequisites
+---
+
+## Features
+
+### Meetings
+
+- Create / edit rooms with a start and end time
+- Public or private visibility
+- Invite links (`inviteCode`)
+- Allowed-email list for private rooms (no invite emails — share the link yourself)
+- Participant capacity (plan-driven; SFU hard cap 50)
+- Status: waiting / active / ended
+- Host can end a meeting from the dashboard
+
+### Realtime
+
+- Camera, microphone, screen share
+- Participant grid and speaking state
+- Chat, raise hand, reactions (LiveKit data channel)
+- Soft LiveKit token refresh before JWT expiry
+- Reconnect / disconnect banner
+
+### Roles & moderation
+
+- Host, moderator, participant, guest (guests only on public rooms)
+- Mute, disable camera, remove participant
+- Moderator promote/demote
+
+### Account
+
+- Register / login / logout
+- Database sessions (httpOnly cookie)
+- Password change, session revoke, account delete
+- Soft email verification (login works without verifying)
+- Forgot / reset password (Resend optional)
+
+### Plans & billing
+
+- Free / Starter / Pro / Business (seeded in migrations; admins can edit)
+- Limits: max concurrent participants, max room duration
+- Checkout → order → payment → idempotent fulfill
+- ZarinPal when configured; in-app mock gateway in non-production without a merchant
+- Current migration sets plan prices to **0** IRR so checkout still runs without a gateway
+
+### Admin
+
+- Users, rooms, plans, orders, audit logs
+- Bootstrap admins via `ADMIN_EMAILS`
+
+---
+
+## Screenshots
+
+No screenshot assets are checked into the repo yet. When you add them, drop images under `docs/screenshots/` and link them here, for example:
+
+```md
+![Landing](docs/screenshots/landing.png)
+![Dashboard](docs/screenshots/dashboard.png)
+![Meeting](docs/screenshots/meeting.png)
+```
+
+Suggested captures: landing, dashboard, rooms, live meeting, plans, private room settings, admin, account settings.
+
+---
+
+## Tech stack
+
+| Technology | Purpose |
+| ---------- | ------- |
+| Next.js 16 | App Router UI, Server Actions, API routes |
+| React 19 | Application UI |
+| TypeScript | Types across app and libs |
+| Tailwind CSS 4 | Styling |
+| PostgreSQL / Neon | Persistent data |
+| Drizzle ORM | Schema + migrations |
+| LiveKit | Audio, video, screen share, data channel |
+| `@node-rs/argon2` | Password hashing (Argon2id) |
+| Zod | Validation |
+| Vitest | Unit tests |
+| Resend (HTTP API) | Optional auth email |
+| ZarinPal | Optional paid checkout |
+
+---
+
+## Architecture
+
+```text
+Browser
+   │
+   ├── Next.js
+   │     ├── UI
+   │     ├── Server Actions
+   │     └── API routes
+   │
+   ├── PostgreSQL (users, rooms, plans, orders, …)
+   │
+   └── LiveKit (media + in-meeting signals)
+```
+
+**Next.js** owns authentication, room access, plan limits, billing fulfillment, admin actions, and LiveKit token minting.
+
+**PostgreSQL** stores durable application data. LiveKit is not the database.
+
+**LiveKit** carries AV and lightweight collaboration. Secrets (`LIVEKIT_API_SECRET`, `AUTH_SECRET`, `DATABASE_URL`) stay server-side.
+
+There is **no** `middleware.ts`, **no** Socket.IO server, and **no** Redis in this project.
+
+### Important decisions
+
+| Topic | What we do |
+| ----- | ---------- |
+| LiveKit | SFU + SDKs instead of building WebRTC infrastructure from scratch |
+| Drizzle | Typed schema → SQL migrations under `drizzle/` |
+| No Socket.IO | Chat / raise hand / reactions use LiveKit data channels |
+| No Redis | Sessions and rate limits in Postgres for a smaller local stack |
+| Capacity | Soft check via `listParticipants` before token issue; SFU `maxParticipants` is the hard bound (races possible) |
+| Meeting end | Join/token rejected at `endTime`; ending in Postgres does not instantly force-disconnect LiveKit peers |
+| Tokens | Short-lived JWTs from `POST /api/livekit/token` after authz; identities `user:{uuid}` or `guest:{roomId}:{guestId}` |
+| Private rooms | Session email must be on `room_allowed_emails` (host always allowed); guests blocked |
+
+---
+
+## Project structure
+
+```text
+src/
+├── app/           # Routes, Server Actions, API handlers
+├── components/    # UI (meeting, rooms, billing, admin, docs…)
+├── db/            # Drizzle client + schema
+└── lib/           # Auth, rooms, LiveKit, payments, security
+drizzle/           # SQL migrations
+docs/              # Repo markdown (e.g. production-security.md)
+```
+
+---
+
+## Requirements
 
 - Node.js 20+
-- pnpm 9+ (repo pin: see `packageManager` in `package.json`)
-- Neon PostgreSQL database
-- LiveKit server (local for development; VPS + WSS for production)
+- pnpm 12.6 (`packageManager` in `package.json`)
+- PostgreSQL (Neon pooled URL is the usual setup)
+- A reachable LiveKit server (local SFU or LiveKit Cloud)
 
-## Local setup (verified workflow)
+This repo does **not** include a production VPS or custom domain.
+
+---
+
+## Local setup
 
 ```bash
+git clone <repository-url>
+cd meetcast
 pnpm install
 cp .env.example .env.local
 ```
 
-Set at least:
+Fill at least:
 
-- `DATABASE_URL` — Neon pooled connection string
-- `AUTH_SECRET` — long random string (`openssl rand -base64 32`)
-- `LIVEKIT_URL` / `LIVEKIT_API_KEY` / `LIVEKIT_API_SECRET`
+```env
+DATABASE_URL=…
+AUTH_SECRET=…          # openssl rand -base64 32
+LIVEKIT_URL=ws://localhost:7880
+LIVEKIT_API_KEY=devkey
+LIVEKIT_API_SECRET=secret
+```
 
 Then:
 
@@ -40,222 +181,150 @@ pnpm db:migrate
 pnpm dev
 ```
 
-### Local LiveKit
+### LiveKit locally
 
-1. Run a local LiveKit server ([local docs](https://docs.livekit.io/home/self-hosting/local/)).
-2. Typical development values:
+1. Run a local LiveKit server ([docs](https://docs.livekit.io/home/self-hosting/local/)) or use LiveKit Cloud credentials.
+2. Keep API key/secret aligned with the server config.
+3. Register → create a room → open `/room/[roomId]`. Use a second browser profile for guest / multi-user tests.
 
-```env
-LIVEKIT_URL=ws://localhost:7880
-LIVEKIT_API_KEY=devkey
-LIVEKIT_API_SECRET=secret
+Never put secrets in `NEXT_PUBLIC_*` variables.
+
+---
+
+## Environment variables
+
+| Variable | Required | Description |
+| -------- | -------- | ----------- |
+| `DATABASE_URL` | Yes | Postgres connection (Neon pooled) |
+| `AUTH_SECRET` | Yes | Session + guest cookie signing (≥32 chars in production) |
+| `LIVEKIT_URL` | Yes | LiveKit WebSocket URL |
+| `LIVEKIT_API_KEY` | Yes | LiveKit API key |
+| `LIVEKIT_API_SECRET` | Yes | LiveKit API secret (server-only) |
+| `NEXT_PUBLIC_APP_URL` | Recommended in prod | Absolute app origin for invites / emails |
+| `ADMIN_EMAILS` | Optional | Comma-separated bootstrap admin emails |
+| `RESEND_API_KEY` | Optional | Auth email; app works without it |
+| `RESEND_FROM_EMAIL` | Optional | Sender; defaults to Resend test address |
+| `ZARINPAL_MERCHANT_ID` | Optional* | Paid checkout |
+| `ZARINPAL_SANDBOX` | Optional | Defaults to sandbox outside production |
+| `PAYMENT_PROVIDER` | Optional | `auto` \| `zarinpal` \| `mock` |
+
+\* Non-zero prices need a provider. Zero-price plans fulfill without a gateway. In non-production, missing ZarinPal merchant → in-app mock at `/billing/pay/[orderId]`.
+
+Full comments: [`.env.example`](.env.example).
+
+---
+
+## Database
+
+```bash
+pnpm db:migrate    # apply drizzle/*.sql
+pnpm db:generate   # after schema edits
+pnpm db:studio     # browse
+pnpm db:check      # journal sanity
 ```
 
-3. Register/login → create a room → open `/room/[roomId]`.
-4. Use a second browser/profile for multi-participant and guest invite tests.
+Default plans are inserted by migration (Free 5/60m, Starter 10/120m, Pro 25/240m, Business 50/unlimited duration within the app ceiling). There is no separate seed script.
 
-**Never** put `LIVEKIT_API_SECRET`, `AUTH_SECRET`, or `DATABASE_URL` in
-`NEXT_PUBLIC_*` variables or client code.
+Do not run destructive reset/drop against production databases.
+
+---
 
 ## Scripts
 
 ```bash
-pnpm dev          # development server
+pnpm dev          # Next.js development server
+pnpm build        # production build
+pnpm start        # serve production build
 pnpm lint
 pnpm typecheck
-pnpm test         # unit tests (authz/protocol/capacity)
-pnpm build
-pnpm start        # production Node server (after build)
-pnpm db:generate  # generate SQL migrations from schema
-pnpm db:migrate   # apply migrations to DATABASE_URL
-pnpm db:studio    # Drizzle Studio
-pnpm db:check     # validate migration journal
+pnpm test         # Vitest
 ```
 
-## Database migrations (production-safe)
+---
 
-Migrations live in `drizzle/` and are applied with Drizzle Kit against
-`DATABASE_URL`.
+## How it works (short)
 
-**Safe workflow (do not reset production data):**
+### Create a meeting
 
-1. Ensure `DATABASE_URL` points at the intended database (Neon console).
-2. Review pending SQL under `drizzle/*.sql`.
-3. Apply:
+```text
+Create room → validate → check plan limits → save room (+ allowlist) → ready
+```
+
+### Join a meeting
+
+```text
+Invite/room URL → schedule check → visibility/access → capacity → LiveKit token → connect
+```
+
+### Public vs private
+
+- **Public:** invite link + normal schedule/capacity; guests allowed.
+- **Private:** must be logged in; account email on allowlist (or host). No LiveKit token otherwise. No invitation email product.
+
+### Billing
+
+```text
+Plans → checkout → order (amount from plan) → pay or zero-fulfill → verify → fulfillPaidOrder → plan on user
+```
+
+---
+
+## Security (summary)
+
+- Argon2id, httpOnly sessions, SameSite cookies
+- Same-origin checks on sensitive APIs
+- Postgres rate limits (login, register, guest join, tokens, checkout, …)
+- Server-only LiveKit secrets; short-lived tokens after authz
+- Payment amounts from DB; idempotent fulfillment
+- Security headers in `next.config.ts`
+
+Operational checklist: [`docs/production-security.md`](docs/production-security.md).
+
+---
+
+## Testing
+
+Vitest covers payments, room visibility, schedule, auth email tokens, plans, admin policy helpers, security helpers, settings, and reliability/protocol pieces under `src/lib/__tests__/`.
 
 ```bash
-pnpm db:migrate
+pnpm test
 ```
 
-4. Confirm with `pnpm db:check` if needed.
+No coverage percentage is claimed here.
 
-Do **not** run destructive reset/drop commands against production.
-`pnpm db:generate` only creates new migration files from schema changes; review
-them before applying.
+---
 
-## Production architecture
+## Current limitations
 
+- No VPS / custom domain / production LiveKit is provisioned by this repository
+- Email and paid checkout need external accounts (Resend, ZarinPal) when you want them live
+- Soft capacity checks can race; SFU max remains the hard bound
+- Ending a room in Postgres does not instantly disconnect LiveKit peers
+- Sustained 50-participant load is not benchmarked here
+
+---
+
+## Future deployment (checklist, not a live install)
+
+```text
+Next.js host  +  PostgreSQL  +  LiveKit (WSS, open media ports, usually TURN)
 ```
-Browser ──HTTPS──► Next.js app (Node)
-                      │
-                      ├──► Neon PostgreSQL (DATABASE_URL)
-                      │
-                      └──► issues LiveKit JWT (LIVEKIT_API_KEY/SECRET)
-Browser ──WSS/WebRTC──► LiveKit SFU on VPS (LIVEKIT_URL)
-```
-
-Moving from local `ws://localhost:7880` to production requires **env changes
-only** (`LIVEKIT_URL=wss://…`). No application rewrite.
-
-## Production deployment guide
-
-### 1. Requirements
-
-- Host for the Next.js app (Node 20+ capable, or equivalent)
-- Neon project + pooled `DATABASE_URL`
-- VPS (or equivalent) for self-hosted LiveKit
-- Domains/TLS certificates for the app and LiveKit (HTTPS + WSS)
-
-### 2. Environment variables
-
-Set on the **server only** (see `.env.example`):
-
-| Variable | Notes |
-|----------|--------|
-| `DATABASE_URL` | Neon pooled URL; never public |
-| `AUTH_SECRET` | ≥32 chars in production runtime |
-| `ADMIN_EMAILS` | Optional comma-separated emails auto-promoted to admin |
-| `LIVEKIT_URL` | Production must be `wss://` (or `https://`) |
-| `LIVEKIT_API_KEY` | From LiveKit server config |
-| `LIVEKIT_API_SECRET` | Strong secret; not `secret`/`dev` defaults |
-| `NEXT_PUBLIC_APP_URL` | Optional absolute origin for invite links |
-
-Runtime production checks reject weak LiveKit secrets and non-`wss` URLs when
-the server actually runs (`NODE_ENV=production`).
-
-### 3. Neon database
-
-1. Create a Neon project.
-2. Copy the **pooled** connection string into `DATABASE_URL`.
-3. Run `pnpm db:migrate` from a trusted machine/CI with that URL.
-
-### 4. Drizzle migration
-
-```bash
-pnpm db:migrate
-```
-
-Verified locally against Neon-compatible Postgres when `DATABASE_URL` is set.
-**Production migrate against your live Neon DB is expected configuration — run
-only with intentional credentials.**
-
-### 5. Next.js build / start
 
 ```bash
 pnpm install --frozen-lockfile
-pnpm lint
-pnpm typecheck
-pnpm test
-pnpm build
-pnpm start
+pnpm build && pnpm start
 ```
 
-Bind/reverse-proxy `pnpm start` behind HTTPS (nginx, Caddy, cloud load balancer).
+Set production env (strong `AUTH_SECRET`, `wss://` LiveKit URL, migrate DB). In-app guide: `/docs/deployment`.
 
-### 6. LiveKit VPS overview (expected configuration — not deployed by this repo)
+---
 
-Typical self-hosted setup:
+## Health
 
-- Install LiveKit server on a VPS ([self-hosting docs](https://docs.livekit.io/home/self-hosting/)).
-- Point a subdomain (e.g. `livekit.example.com`) at the VPS.
-- Terminate TLS so clients use `wss://livekit.example.com`.
-- Configure API key + secret; put the same values in the Next.js env.
-- Open required UDP/TCP ports for WebRTC (see LiveKit firewall docs).
-- Prefer synchronized system time (NTP) on app + LiveKit hosts (JWT/`nbf`/`exp`).
-- For restrictive NATs, plan **TURN** (LiveKit TURN or coturn) — often required
-  for reliable real-world connectivity.
+`GET /api/health` — safe `ok` / `degraded` after a database check.
 
-This repository does **not** provision the VPS. Treat the above as the expected
-production checklist, not a verified deployment log.
+---
 
-### 7. HTTPS / WSS
+## Author
 
-- App origin: `https://…`
-- LiveKit: `wss://…`
-- Cookies use `Secure` when `NODE_ENV=production`.
-
-### 8. Domain configuration
-
-- App DNS → Next.js host / CDN
-- LiveKit DNS → VPS
-- Set `NEXT_PUBLIC_APP_URL` to the public app origin so invite links are absolute
-
-### 9. Security checklist
-
-See **[docs/production-security.md](docs/production-security.md)** for the full
-production security checklist (env, HTTPS, cookies, LiveKit, rate limits, HSTS).
-
-Quick list:
-
-- [ ] No secrets in `NEXT_PUBLIC_*` or client bundles
-- [ ] Strong `AUTH_SECRET` and LiveKit API secret
-- [ ] `LIVEKIT_URL` is `wss://` in production (also set at build for CSP)
-- [ ] TLS on app and LiveKit
-- [ ] Migrations reviewed before apply
-- [ ] `/api/health` monitored without exposing internals
-- [ ] Server logs do not include passwords, tokens, or DB URLs (logger redacts common keys)
-- [ ] Reverse proxy sets trusted `X-Forwarded-For` / `X-Real-IP` for rate limits
-
-### 10. Post-deployment verification
-
-1. `GET /api/health` → `{ status: "ok" }`
-2. Register / login / logout
-3. Create room, join, leave
-4. Guest invite join
-5. Camera / microphone / screen share (with LiveKit up)
-6. Chat / raise hand / reactions
-7. Host/moderator mute, disable camera, remove
-8. Second participant reconnect after brief network interruption
-
-## Health endpoint
-
-`GET /api/health` — checks database connectivity. Returns only safe
-`ok` / `degraded` status (no credentials or env dumps).
-
-## Security headers
-
-`next.config.ts` sets:
-
-- `Content-Security-Policy` (production `connect-src` tightened to LiveKit origin when `LIVEKIT_URL` is set at build)
-- `Strict-Transport-Security` in production
-- `X-Content-Type-Options: nosniff`
-- `Referrer-Policy: strict-origin-when-cross-origin`
-- `X-Frame-Options: DENY`
-- `Permissions-Policy` for camera/microphone/display-capture
-- `poweredByHeader: false`
-
-Details: [docs/production-security.md](docs/production-security.md).
-
-## Capacity note
-
-Soft capacity uses LiveKit `listParticipants` before token issue; concurrent
-joins can race. LiveKit room `maxParticipants` (default product target **50**)
-is the hard SFU bound. This is **not** a distributed lock.
-
-## What was verified locally vs not yet tested
-
-| Area | Status |
-|------|--------|
-| `pnpm lint` / `typecheck` / `test` / `build` | Run in this repo |
-| Neon migrations via `pnpm db:migrate` | Supported when `DATABASE_URL` is set |
-| Full multi-user media E2E | Requires running LiveKit — may be unavailable in a given environment |
-| Production VPS / TURN / real NAT | **Not deployed or load-tested by this phase** |
-| Sustained 50-participant load | **Not benchmarked** |
-
-## Known production limitations
-
-- No Redis / secondary realtime bus (by design)
-- Capacity soft-check is racy under burst joins (SFU hard limit remains)
-- Ending/deleting a room in Postgres does not instantly force-disconnect LiveKit peers
-- Strictest CSP may need per-environment `connect-src` allowlists
-- TURN and large-scale load require real infrastructure testing
+Built by [Milad Joodi](https://github.com/MiladJoodi) · [LinkedIn](https://www.linkedin.com/in/joodi/)

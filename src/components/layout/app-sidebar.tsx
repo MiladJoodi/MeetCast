@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
+  BookOpen,
   CalendarDays,
   LayoutGrid,
   Layers,
@@ -30,6 +31,7 @@ const NAV = [
   { href: "/plans", label: "Plans", icon: Layers },
   { href: "/billing", label: "Billing", icon: Receipt },
   { href: "/settings", label: "Account", icon: Settings },
+  { href: "/docs", label: "Docs", icon: BookOpen },
 ] as const;
 
 function isActive(pathname: string, href: string, exact?: boolean) {

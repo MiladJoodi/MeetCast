@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 type HeaderUser = { role: string } | null;
 
 const publicLinks = [
+  { href: "/docs", label: "Docs" },
   { href: "/plans", label: "Plans" },
   { href: "/contact", label: "Contact" },
   { href: "/privacy", label: "Privacy" },
@@ -127,6 +128,9 @@ export function SiteHeaderClient({ user }: { user: HeaderUser }) {
             <>
               {onDarkMarketing ? (
                 <>
+                  <Link href="/docs" className={cn(linkQuiet, "sm:hidden")}>
+                    Docs
+                  </Link>
                   <Link href="/dashboard" className={cn(linkStrong, "hidden sm:inline")}>
                     Open desk
                   </Link>
@@ -140,6 +144,12 @@ export function SiteHeaderClient({ user }: { user: HeaderUser }) {
                 </>
               ) : (
                 <>
+                  <Link
+                    href="/docs"
+                    className="text-[0.8125rem] text-muted-foreground hover:text-foreground sm:hidden"
+                  >
+                    Docs
+                  </Link>
                   <Button size="sm" className="hidden sm:inline-flex" asChild>
                     <Link href="/dashboard">Open desk</Link>
                   </Button>

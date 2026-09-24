@@ -4,6 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { isDarkMarketingPath } from "@/lib/layout/marketing-paths";
+import { isDocsPath } from "@/lib/docs/nav";
+import { SITE_SOCIAL } from "@/lib/site/links";
 
 function isAppRoute(pathname: string) {
   return (
@@ -18,8 +20,11 @@ function isAppRoute(pathname: string) {
 
 export function SiteFooter() {
   const pathname = usePathname();
-  // Dark marketing / auth / invite — no light footer.
-  if (isAppRoute(pathname) || isDarkMarketingPath(pathname)) {
+  // Dark marketing / auth / invite — no light footer (except docs, which are light).
+  if (
+    (isAppRoute(pathname) || isDarkMarketingPath(pathname)) &&
+    !isDocsPath(pathname)
+  ) {
     return null;
   }
 
@@ -45,6 +50,18 @@ export function SiteFooter() {
               >
                 Plans
               </Link>
+              <Link
+                href="/docs"
+                className="text-muted-foreground hover:text-foreground"
+              >
+                Docs
+              </Link>
+              <Link
+                href="/contact"
+                className="text-muted-foreground hover:text-foreground"
+              >
+                Contact
+              </Link>
             </nav>
           </div>
 
@@ -59,14 +76,6 @@ export function SiteFooter() {
                   className="text-muted-foreground hover:text-foreground"
                 >
                   Sign in
-                </Link>
-              ) : null}
-              {pathname !== "/register" ? (
-                <Link
-                  href="/register"
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  Create account
                 </Link>
               ) : null}
               <Link
@@ -99,7 +108,30 @@ export function SiteFooter() {
           </div>
         </div>
 
-        <p className="mt-10 text-xs text-muted-foreground">© 2026 MeetCast</p>
+        <div className="mt-10 flex flex-col gap-3 border-t border-border pt-6 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-xs text-muted-foreground">© 2026 MeetCast</p>
+          <nav
+            className="flex flex-wrap items-center gap-4 text-xs"
+            aria-label="Author"
+          >
+            <a
+              href={SITE_SOCIAL.github.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-muted-foreground hover:text-foreground"
+            >
+              {SITE_SOCIAL.github.label}
+            </a>
+            <a
+              href={SITE_SOCIAL.linkedin.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-muted-foreground hover:text-foreground"
+            >
+              {SITE_SOCIAL.linkedin.label}
+            </a>
+          </nav>
+        </div>
       </div>
     </footer>
   );

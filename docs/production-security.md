@@ -13,8 +13,11 @@ Concise operational checklist for deploying MeetCast. Do not put real secrets in
 | `LIVEKIT_API_SECRET` | Strong secret; never `secret` / `dev` defaults |
 | `NEXT_PUBLIC_APP_URL` | Public HTTPS app origin (invite links) |
 | `ADMIN_EMAILS` | Optional comma-separated bootstrap admin emails |
-| `ZARINPAL_MERCHANT_ID` | Server-only ZarinPal merchant ID (required for checkout) |
+| `RESEND_API_KEY` | Optional — auth emails via Resend; app works without it |
+| `RESEND_FROM_EMAIL` | Optional sender; defaults to Resend test domain |
+| `ZARINPAL_MERCHANT_ID` | Server-only ZarinPal merchant ID (required for paid checkout) |
 | `ZARINPAL_SANDBOX` | `true`/`false`; defaults to sandbox outside production when unset |
+| `PAYMENT_PROVIDER` | Optional: `auto` \| `zarinpal` \| `mock` |
 
 Never prefix secrets with `NEXT_PUBLIC_`. Never commit `.env.local`. Never expose `ZARINPAL_MERCHANT_ID` to the browser.
 
