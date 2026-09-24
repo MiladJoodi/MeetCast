@@ -19,8 +19,12 @@ export function MarketingShell({
   return (
     <div
       className={cn(
-        "mc-invite-page relative isolate flex flex-1 flex-col text-[var(--room-fg)]",
-        scrollable ? "overflow-x-hidden" : "overflow-hidden",
+        "mc-invite-page relative isolate flex w-full min-w-0 flex-col text-[var(--room-fg)]",
+        // overflow-x-hidden forces overflow-y:auto → double scrollbar. Prefer clip.
+        // scrollable pages size to content (body scrolls once); locked pages fill + clip.
+        scrollable
+          ? "overflow-x-clip"
+          : "min-h-0 flex-1 overflow-hidden",
       )}
     >
       <div aria-hidden className="pointer-events-none absolute inset-0">
@@ -30,7 +34,8 @@ export function MarketingShell({
       </div>
       <div
         className={cn(
-          "relative z-10 mx-auto flex w-full max-w-2xl flex-1 flex-col px-4 pb-16 pt-20 sm:px-6",
+          "relative z-10 mx-auto flex w-full min-w-0 max-w-2xl flex-col px-4 pb-16 pt-20 sm:px-6",
+          !scrollable && "flex-1",
           className,
         )}
       >

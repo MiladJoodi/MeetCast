@@ -49,7 +49,7 @@ export function DocsShell({ children }: { children: React.ReactNode }) {
   const { prev, next } = docsPrevNext(pathname);
 
   return (
-    <div className="mc-invite-page relative isolate flex flex-1 flex-col overflow-x-hidden text-[var(--room-fg)]">
+    <div className="mc-invite-page relative isolate flex w-full min-w-0 flex-col overflow-x-clip text-[var(--room-fg)]">
       <div aria-hidden className="pointer-events-none absolute inset-0">
         <div className="mc-stage-aura mc-stage-aura-1" />
         <div className="mc-stage-aura mc-stage-aura-2" />

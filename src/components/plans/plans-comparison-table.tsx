@@ -224,10 +224,10 @@ export function PlansComparisonTable({
         })}
       </div>
 
-      {/* Desktop */}
+      {/* Desktop — horizontal scroll only; do not force overflow-y:auto */}
       <div
         className={cn(
-          "hidden overflow-hidden rounded-xl border md:block",
+          "hidden overflow-x-auto overflow-y-hidden overscroll-x-contain rounded-xl border md:block",
           marketing ? "border-white/12" : "border-border/80",
         )}
       >

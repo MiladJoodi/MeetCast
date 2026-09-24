@@ -37,16 +37,16 @@ export default function RootLayout({
       lang="en"
       suppressHydrationWarning
       data-accent="forest"
-      className={`${sourceSans.variable} h-full antialiased`}
+      className={`${sourceSans.variable} min-h-full overflow-x-clip antialiased`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: accentBootScript }} />
       </head>
-      <body className="flex min-h-full flex-col font-sans">
+      <body className="flex min-h-full flex-col overflow-x-clip font-sans">
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
           <AccentProvider>
             <SiteHeader />
-            <main className="flex flex-1 flex-col">{children}</main>
+            <main className="flex min-w-0 flex-1 flex-col">{children}</main>
             <SiteFooter />
             <Toaster />
           </AccentProvider>
