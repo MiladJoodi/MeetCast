@@ -18,17 +18,17 @@ export function DocsCallout({
       className={cn(
         "rounded-lg border px-4 py-3 text-sm leading-relaxed",
         variant === "warning"
-          ? "border-amber-500/35 bg-amber-500/8 text-foreground"
-          : "border-border bg-muted/35 text-foreground",
+          ? "border-amber-400/35 bg-amber-400/10 text-white"
+          : "border-white/12 bg-white/5 text-white",
         className,
       )}
     >
       {title ? (
-        <p className="mb-1 text-xs font-semibold tracking-wide uppercase">
+        <p className="mb-1 text-xs font-semibold tracking-wide text-white/80 uppercase">
           {title}
         </p>
       ) : null}
-      <div className="text-muted-foreground [&_a]:underline [&_a]:underline-offset-3 [&_code]:rounded [&_code]:bg-muted [&_code]:px-1 [&_code]:py-0.5 [&_code]:text-[0.8em] [&_code]:text-foreground">
+      <div className="text-white/55 [&_a]:text-white [&_a]:underline [&_a]:underline-offset-3 [&_code]:rounded [&_code]:bg-white/10 [&_code]:px-1 [&_code]:py-0.5 [&_code]:text-[0.8em] [&_code]:text-white [&_p]:mt-2">
         {children}
       </div>
     </aside>

@@ -30,8 +30,8 @@ function NavList({
             className={cn(
               "rounded-md px-2.5 py-1.5 text-sm transition-colors",
               active
-                ? "bg-muted font-medium text-foreground"
-                : "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
+                ? "bg-white/10 font-medium text-white"
+                : "text-white/55 hover:bg-white/5 hover:text-white/85",
             )}
             aria-current={active ? "page" : undefined}
           >
@@ -49,88 +49,97 @@ export function DocsShell({ children }: { children: React.ReactNode }) {
   const { prev, next } = docsPrevNext(pathname);
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-1 gap-8 px-4 py-8 sm:px-6 lg:gap-10">
-      <aside className="hidden w-48 shrink-0 lg:block">
-        <div className="sticky top-16 space-y-4">
-          <p className="px-2.5 text-xs font-medium tracking-wide text-muted-foreground uppercase">
-            Docs
-          </p>
-          <NavList pathname={pathname} />
-        </div>
-      </aside>
+    <div className="mc-invite-page relative isolate flex flex-1 flex-col overflow-x-hidden text-[var(--room-fg)]">
+      <div aria-hidden className="pointer-events-none absolute inset-0">
+        <div className="mc-stage-aura mc-stage-aura-1" />
+        <div className="mc-stage-aura mc-stage-aura-2" />
+        <div className="mc-stage-grid opacity-[0.08]" />
+      </div>
 
-      <div className="min-w-0 flex-1">
-        <div className="mb-6 flex items-center justify-between gap-3 lg:hidden">
-          <p className="text-sm font-medium text-muted-foreground">Docs</p>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            aria-expanded={open}
-            aria-controls="docs-mobile-nav"
-            onClick={() => setOpen((value) => !value)}
-          >
-            {open ? (
-              <XIcon className="size-4" aria-hidden />
-            ) : (
-              <MenuIcon className="size-4" aria-hidden />
-            )}
-            Menu
-          </Button>
-        </div>
-
-        {open ? (
-          <div
-            id="docs-mobile-nav"
-            className="mb-6 rounded-lg border border-border p-2 lg:hidden"
-          >
-            <NavList pathname={pathname} onNavigate={() => setOpen(false)} />
+      <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-1 gap-8 px-4 pb-16 pt-20 sm:px-6 sm:pt-24 lg:gap-10">
+        <aside className="hidden w-48 shrink-0 lg:block">
+          <div className="sticky top-16 space-y-4">
+            <p className="px-2.5 text-xs font-medium tracking-wide text-white/45 uppercase">
+              Docs
+            </p>
+            <NavList pathname={pathname} />
           </div>
-        ) : null}
+        </aside>
 
-        <article className="docs-prose min-w-0">{children}</article>
+        <div className="min-w-0 flex-1">
+          <div className="mb-6 flex items-center justify-between gap-3 lg:hidden">
+            <p className="text-sm font-medium text-white/55">Docs</p>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="border-white/20 bg-transparent text-white hover:bg-white/10 hover:text-white"
+              aria-expanded={open}
+              aria-controls="docs-mobile-nav"
+              onClick={() => setOpen((value) => !value)}
+            >
+              {open ? (
+                <XIcon className="size-4" aria-hidden />
+              ) : (
+                <MenuIcon className="size-4" aria-hidden />
+              )}
+              Menu
+            </Button>
+          </div>
 
-        <nav
-          className="mt-12 flex flex-col gap-3 border-t border-border pt-6 sm:flex-row sm:justify-between"
-          aria-label="Docs pagination"
-        >
-          {prev ? (
-            <Link
-              href={prev.href}
-              className="group flex items-center gap-2 rounded-lg border border-border px-3 py-2.5 text-sm transition-colors hover:border-foreground/25 hover:bg-muted/40"
+          {open ? (
+            <div
+              id="docs-mobile-nav"
+              className="mb-6 rounded-lg border border-white/12 bg-[color-mix(in_oklch,var(--room-chrome)_88%,black)] p-2 lg:hidden"
             >
-              <ChevronLeft
-                className="size-4 text-muted-foreground group-hover:text-foreground"
-                aria-hidden
-              />
-              <span>
-                <span className="block text-[0.6875rem] text-muted-foreground">
-                  Previous
-                </span>
-                <span className="font-medium">{prev.label}</span>
-              </span>
-            </Link>
-          ) : (
-            <span />
-          )}
-          {next ? (
-            <Link
-              href={next.href}
-              className="group flex items-center justify-end gap-2 rounded-lg border border-border px-3 py-2.5 text-sm transition-colors hover:border-foreground/25 hover:bg-muted/40 sm:ml-auto"
-            >
-              <span className="text-right">
-                <span className="block text-[0.6875rem] text-muted-foreground">
-                  Next
-                </span>
-                <span className="font-medium">{next.label}</span>
-              </span>
-              <ChevronRight
-                className="size-4 text-muted-foreground group-hover:text-foreground"
-                aria-hidden
-              />
-            </Link>
+              <NavList pathname={pathname} onNavigate={() => setOpen(false)} />
+            </div>
           ) : null}
-        </nav>
+
+          <article className="docs-prose min-w-0">{children}</article>
+
+          <nav
+            className="mt-12 flex flex-col gap-3 border-t border-white/10 pt-6 sm:flex-row sm:justify-between"
+            aria-label="Docs pagination"
+          >
+            {prev ? (
+              <Link
+                href={prev.href}
+                className="group flex items-center gap-2 rounded-lg border border-white/12 px-3 py-2.5 text-sm text-white/80 transition-colors hover:border-white/25 hover:bg-white/5 hover:text-white"
+              >
+                <ChevronLeft
+                  className="size-4 text-white/45 group-hover:text-white"
+                  aria-hidden
+                />
+                <span>
+                  <span className="block text-[0.6875rem] text-white/45">
+                    Previous
+                  </span>
+                  <span className="font-medium">{prev.label}</span>
+                </span>
+              </Link>
+            ) : (
+              <span />
+            )}
+            {next ? (
+              <Link
+                href={next.href}
+                className="group flex items-center justify-end gap-2 rounded-lg border border-white/12 px-3 py-2.5 text-sm text-white/80 transition-colors hover:border-white/25 hover:bg-white/5 hover:text-white sm:ml-auto"
+              >
+                <span className="text-right">
+                  <span className="block text-[0.6875rem] text-white/45">
+                    Next
+                  </span>
+                  <span className="font-medium">{next.label}</span>
+                </span>
+                <ChevronRight
+                  className="size-4 text-white/45 group-hover:text-white"
+                  aria-hidden
+                />
+              </Link>
+            ) : null}
+          </nav>
+        </div>
       </div>
     </div>
   );

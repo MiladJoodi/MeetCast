@@ -1,14 +1,14 @@
-import { requireUser } from "@/lib/auth/session";
+import type { Metadata } from "next";
 
-import { AppShell } from "@/components/layout/app-shell";
+export const metadata: Metadata = {
+  title: "Plans",
+  description: "Compare MeetCast plans and limits.",
+};
 
-export default async function PlansLayout({
+export default function PlansLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const user = await requireUser();
-  return (
-    <AppShell user={{ name: user.name, role: user.role }}>{children}</AppShell>
-  );
+  return children;
 }

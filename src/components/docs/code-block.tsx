@@ -29,19 +29,19 @@ export function CodeBlock({ code, language, className }: CodeBlockProps) {
   return (
     <div
       className={cn(
-        "group relative overflow-hidden rounded-lg border border-border bg-muted/40",
+        "group relative overflow-hidden rounded-lg border border-white/12 bg-[color-mix(in_oklch,var(--room-chrome)_88%,black)]",
         className,
       )}
     >
-      <div className="flex items-center justify-between gap-2 border-b border-border px-3 py-1.5">
-        <span className="text-[0.6875rem] font-medium tracking-wide text-muted-foreground uppercase">
+      <div className="flex items-center justify-between gap-2 border-b border-white/10 px-3 py-1.5">
+        <span className="text-[0.6875rem] font-medium tracking-wide text-white/45 uppercase">
           {language ?? "code"}
         </span>
         <Button
           type="button"
           variant="ghost"
           size="xs"
-          className="h-7 gap-1.5 text-muted-foreground"
+          className="h-7 gap-1.5 text-white/55 hover:bg-white/10 hover:text-white"
           onClick={copy}
           aria-label={copied ? "Copied" : "Copy code"}
         >
@@ -53,7 +53,7 @@ export function CodeBlock({ code, language, className }: CodeBlockProps) {
           {copied ? "Copied" : "Copy"}
         </Button>
       </div>
-      <pre className="overflow-x-auto p-3 text-[0.8125rem] leading-relaxed">
+      <pre className="overflow-x-auto p-3 text-[0.8125rem] leading-relaxed text-white/85">
         <code>{trimmed}</code>
       </pre>
     </div>

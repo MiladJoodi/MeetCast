@@ -1,0 +1,11 @@
+# Netlify + Next.js (@netlify/plugin-nextjs is enabled in the Netlify UI).
+[build]
+  command = "pnpm run build"
+
+# Next.js bakes LIVEKIT_URL into CSP headers at build time, and Turbopack may
+# mirror other server env values into .next/cache. Netlify secrets scanning then
+# fails the deploy even though those values are expected in build artifacts —
+# not a public client leak of NEXT_PUBLIC_* secrets.
+[build.environment]
+  SECRETS_SCAN_OMIT_KEYS = "LIVEKIT_URL,AUTH_SECRET,LIVEKIT_API_KEY,LIVEKIT_API_SECRET,DATABASE_URL,RESEND_API_KEY,RESEND_FROM_EMAIL,ZARINPAL_MERCHANT_ID"
+  SECRETS_SCAN_OMIT_PATHS = ".next/cache,.netlify/.next/cache"

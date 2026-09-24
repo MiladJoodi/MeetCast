@@ -11,6 +11,23 @@ export function isDarkMarketingPath(pathname: string): boolean {
     pathname === "/verify-email" ||
     pathname === "/contact" ||
     pathname === "/privacy" ||
-    pathname === "/terms"
+    pathname === "/terms" ||
+    pathname === "/plans" ||
+    pathname === "/docs" ||
+    pathname.startsWith("/docs/")
+  );
+}
+
+/**
+ * Authenticated app chrome (AppShell). Public marketing routes are excluded —
+ * including /plans and /docs, which use the shared dark site header.
+ */
+export function isAppChromePath(pathname: string): boolean {
+  return (
+    pathname.startsWith("/dashboard") ||
+    pathname.startsWith("/settings") ||
+    pathname.startsWith("/billing") ||
+    pathname.startsWith("/checkout") ||
+    pathname.startsWith("/admin")
   );
 }

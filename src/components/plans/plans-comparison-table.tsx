@@ -15,6 +15,8 @@ import { cn } from "@/lib/utils";
 type PlansComparisonTableProps = {
   plans: Plan[];
   currentPlanId?: string | null;
+  signedIn?: boolean;
+  tone?: "default" | "marketing";
 };
 
 function groupRows(rows: PlanComparisonRow[]) {
@@ -31,11 +33,20 @@ function groupRows(rows: PlanComparisonRow[]) {
   return groups;
 }
 
-function PlanCellValue({ value }: { value: string }) {
+function PlanCellValue({
+  value,
+  marketing = false,
+}: {
+  value: string;
+  marketing?: boolean;
+}) {
   if (value === "✓") {
     return (
       <span
-        className="inline-flex items-center justify-center text-success"
+        className={cn(
+          "inline-flex items-center justify-center",
+          marketing ? "text-[var(--live)]" : "text-success",
+        )}
         title="Included"
       >
         <Check className="size-4" strokeWidth={2.5} aria-label="Included" />
@@ -45,7 +56,10 @@ function PlanCellValue({ value }: { value: string }) {
   if (value === "Unlimited") {
     return (
       <span
-        className="inline-flex items-center justify-center gap-1.5 text-foreground"
+        className={cn(
+          "inline-flex items-center justify-center gap-1.5",
+          marketing ? "text-white" : "text-foreground",
+        )}
         title="Unlimited"
       >
         <Infinity className="size-4 shrink-0" strokeWidth={2} aria-hidden />
@@ -59,15 +73,23 @@ function PlanCellValue({ value }: { value: string }) {
 export function PlansComparisonTable({
   plans,
   currentPlanId,
+  signedIn = true,
+  tone = "default",
 }: PlansComparisonTableProps) {
   if (plans.length === 0) return null;
 
   const rows = buildPlanComparisonRows(plans);
   const groups = groupRows(rows);
+  const marketing = tone === "marketing";
 
   return (
     <section className="space-y-3">
-      <h2 className="text-sm font-medium text-muted-foreground">
+      <h2
+        className={cn(
+          "text-sm font-medium",
+          marketing ? "text-white/50" : "text-muted-foreground",
+        )}
+      >
         Full comparison
       </h2>
 
@@ -79,50 +101,122 @@ export function PlansComparisonTable({
             <article
               key={plan.id}
               className={cn(
-                "overflow-hidden rounded-xl border border-border/80 bg-surface-elevated",
-                isCurrent && "border-brand/30 bg-brand-soft/25",
+                "overflow-hidden rounded-xl border",
+                marketing
+                  ? "border-white/12 bg-[color-mix(in_oklch,var(--room-chrome)_88%,black)]"
+                  : "border-border/80 bg-surface-elevated",
+                isCurrent &&
+                  (marketing
+                    ? "border-[color-mix(in_oklch,var(--live)_55%,white)]/40"
+                    : "border-brand/30 bg-brand-soft/25"),
               )}
             >
-              <div className="flex items-center justify-between gap-2 border-b border-border/70 px-4 py-3">
-                <h3 className="font-semibold tracking-tight">{plan.name}</h3>
+              <div
+                className={cn(
+                  "flex items-center justify-between gap-2 border-b px-4 py-3",
+                  marketing ? "border-white/10" : "border-border/70",
+                )}
+              >
+                <h3
+                  className={cn(
+                    "font-semibold tracking-tight",
+                    marketing && "text-white",
+                  )}
+                >
+                  {plan.name}
+                </h3>
                 {isCurrent ? (
-                  <span className="text-xs text-brand">Current</span>
+                  <span
+                    className={cn(
+                      "text-xs",
+                      marketing ? "text-[var(--live)]" : "text-brand",
+                    )}
+                  >
+                    Current
+                  </span>
                 ) : null}
               </div>
               {groups.map((group) => (
                 <div
                   key={group.name}
-                  className="border-b border-border/70 last:border-0"
+                  className={cn(
+                    "border-b last:border-0",
+                    marketing ? "border-white/10" : "border-border/70",
+                  )}
                 >
-                  <p className="bg-muted/30 px-4 py-2 text-xs font-medium text-muted-foreground">
+                  <p
+                    className={cn(
+                      "px-4 py-2 text-xs font-medium",
+                      marketing
+                        ? "bg-white/5 text-white/45"
+                        : "bg-muted/30 text-muted-foreground",
+                    )}
+                  >
                     {group.name}
                   </p>
                   <dl className="px-4">
                     {group.rows.map((row) => (
                       <div
                         key={row.feature}
-                        className="flex justify-between gap-4 border-b border-border/50 py-2.5 last:border-0"
+                        className={cn(
+                          "flex justify-between gap-4 border-b py-2.5 last:border-0",
+                          marketing ? "border-white/8" : "border-border/50",
+                        )}
                       >
-                        <dt className="text-sm text-muted-foreground">
+                        <dt
+                          className={cn(
+                            "text-sm",
+                            marketing
+                              ? "text-white/55"
+                              : "text-muted-foreground",
+                          )}
+                        >
                           {row.feature}
                         </dt>
-                        <dd className="text-sm font-medium tabular-nums">
-                          <PlanCellValue value={row.values[planIndex] ?? ""} />
+                        <dd
+                          className={cn(
+                            "text-sm font-medium tabular-nums",
+                            marketing && "text-white",
+                          )}
+                        >
+                          <PlanCellValue
+                            value={row.values[planIndex] ?? ""}
+                            marketing={marketing}
+                          />
                         </dd>
                       </div>
                     ))}
                   </dl>
                 </div>
               ))}
-              <div className="space-y-2 border-t border-border/70 px-4 py-3">
-                <p className="text-sm font-semibold tabular-nums">
+              <div
+                className={cn(
+                  "space-y-2 border-t px-4 py-3",
+                  marketing ? "border-white/10" : "border-border/70",
+                )}
+              >
+                <p
+                  className={cn(
+                    "text-sm font-semibold tabular-nums",
+                    marketing && "text-white",
+                  )}
+                >
                   {formatPlanPrice(plan.priceAmount, plan.currency)}
                 </p>
                 <OrderPlanButton
                   planId={plan.id}
                   isCurrent={isCurrent}
                   canPurchase={isPlanPurchasableOnline(plan)}
-                  className="w-full"
+                  signedIn={signedIn}
+                  className={cn(
+                    "w-full",
+                    marketing &&
+                      !isCurrent &&
+                      "border-transparent bg-white text-black hover:bg-white/90",
+                    marketing &&
+                      isCurrent &&
+                      "border-white/20 bg-transparent text-white/70",
+                  )}
                 />
               </div>
             </article>
@@ -131,13 +225,30 @@ export function PlansComparisonTable({
       </div>
 
       {/* Desktop */}
-      <div className="hidden overflow-hidden rounded-xl border border-border/80 md:block">
+      <div
+        className={cn(
+          "hidden overflow-hidden rounded-xl border md:block",
+          marketing ? "border-white/12" : "border-border/80",
+        )}
+      >
         <table className="w-full min-w-[40rem] border-collapse text-left text-sm">
           <thead>
-            <tr className="border-b border-border bg-muted/30">
+            <tr
+              className={cn(
+                "border-b",
+                marketing
+                  ? "border-white/10 bg-white/5"
+                  : "border-border bg-muted/30",
+              )}
+            >
               <th
                 scope="col"
-                className="sticky left-0 z-10 bg-muted/30 px-4 py-3 text-sm font-medium text-muted-foreground"
+                className={cn(
+                  "sticky left-0 z-10 px-4 py-3 text-sm font-medium",
+                  marketing
+                    ? "bg-[color-mix(in_oklch,var(--room-chrome)_92%,black)] text-white/45"
+                    : "bg-muted/30 text-muted-foreground",
+                )}
               >
                 Feature
               </th>
@@ -149,7 +260,11 @@ export function PlansComparisonTable({
                     scope="col"
                     className={cn(
                       "px-4 py-3 font-semibold tracking-tight",
-                      isCurrent && "bg-brand-soft/40 text-brand",
+                      marketing && "text-white",
+                      isCurrent &&
+                        (marketing
+                          ? "bg-white/8 text-[var(--live)]"
+                          : "bg-brand-soft/40 text-brand"),
                     )}
                   >
                     {plan.name}
@@ -169,7 +284,12 @@ export function PlansComparisonTable({
                 <tr>
                   <th
                     colSpan={plans.length + 1}
-                    className="bg-muted/25 px-4 py-2 text-left text-xs font-medium text-muted-foreground"
+                    className={cn(
+                      "px-4 py-2 text-left text-xs font-medium",
+                      marketing
+                        ? "bg-white/5 text-white/45"
+                        : "bg-muted/25 text-muted-foreground",
+                    )}
                   >
                     {group.name}
                   </th>
@@ -177,11 +297,19 @@ export function PlansComparisonTable({
                 {group.rows.map((row) => (
                   <tr
                     key={row.feature}
-                    className="border-b border-border/60 last:border-0"
+                    className={cn(
+                      "border-b last:border-0",
+                      marketing ? "border-white/8" : "border-border/60",
+                    )}
                   >
                     <th
                       scope="row"
-                      className="sticky left-0 z-10 bg-background px-4 py-3 font-medium text-muted-foreground"
+                      className={cn(
+                        "sticky left-0 z-10 px-4 py-3 font-medium",
+                        marketing
+                          ? "bg-[color-mix(in_oklch,var(--room-chrome)_92%,black)] text-white/55"
+                          : "bg-background text-muted-foreground",
+                      )}
                     >
                       {row.feature}
                     </th>
@@ -195,10 +323,17 @@ export function PlansComparisonTable({
                           key={`${row.feature}-${plan?.id ?? index}`}
                           className={cn(
                             "px-4 py-3 text-center tabular-nums",
-                            isCurrent && "bg-brand-soft/20",
+                            marketing && "text-white/90",
+                            isCurrent &&
+                              (marketing
+                                ? "bg-white/5"
+                                : "bg-brand-soft/20"),
                           )}
                         >
-                          <PlanCellValue value={value} />
+                          <PlanCellValue
+                            value={value}
+                            marketing={marketing}
+                          />
                         </td>
                       );
                     })}
@@ -206,10 +341,20 @@ export function PlansComparisonTable({
                 ))}
               </Fragment>
             ))}
-            <tr className="border-t border-border bg-muted/15">
+            <tr
+              className={cn(
+                "border-t",
+                marketing ? "border-white/10 bg-white/5" : "border-border bg-muted/15",
+              )}
+            >
               <th
                 scope="row"
-                className="sticky left-0 z-10 bg-muted/15 px-4 py-4 text-sm font-medium text-muted-foreground"
+                className={cn(
+                  "sticky left-0 z-10 px-4 py-4 text-sm font-medium",
+                  marketing
+                    ? "bg-[color-mix(in_oklch,var(--room-chrome)_92%,black)] text-white/45"
+                    : "bg-muted/15 text-muted-foreground",
+                )}
               >
                 Price
               </th>
@@ -220,17 +365,32 @@ export function PlansComparisonTable({
                     key={`order-${plan.id}`}
                     className={cn(
                       "space-y-2 px-4 py-4 align-bottom",
-                      isCurrent && "bg-brand-soft/20",
+                      isCurrent &&
+                        (marketing ? "bg-white/5" : "bg-brand-soft/20"),
                     )}
                   >
-                    <p className="text-center text-sm font-semibold tabular-nums">
+                    <p
+                      className={cn(
+                        "text-center text-sm font-semibold tabular-nums",
+                        marketing && "text-white",
+                      )}
+                    >
                       {formatPlanPrice(plan.priceAmount, plan.currency)}
                     </p>
                     <OrderPlanButton
                       planId={plan.id}
                       isCurrent={isCurrent}
                       canPurchase={isPlanPurchasableOnline(plan)}
-                      className="w-full"
+                      signedIn={signedIn}
+                      className={cn(
+                        "w-full",
+                        marketing &&
+                          !isCurrent &&
+                          "border-transparent bg-white text-black hover:bg-white/90",
+                        marketing &&
+                          isCurrent &&
+                          "border-white/20 bg-transparent text-white/70",
+                      )}
                     />
                   </td>
                 );

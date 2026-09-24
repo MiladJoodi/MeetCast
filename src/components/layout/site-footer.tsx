@@ -3,28 +3,17 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { isDarkMarketingPath } from "@/lib/layout/marketing-paths";
-import { isDocsPath } from "@/lib/docs/nav";
+import {
+  isAppChromePath,
+  isDarkMarketingPath,
+} from "@/lib/layout/marketing-paths";
 import { SITE_SOCIAL } from "@/lib/site/links";
-
-function isAppRoute(pathname: string) {
-  return (
-    pathname.startsWith("/dashboard") ||
-    pathname.startsWith("/settings") ||
-    pathname.startsWith("/plans") ||
-    pathname.startsWith("/billing") ||
-    pathname.startsWith("/checkout") ||
-    pathname.startsWith("/admin")
-  );
-}
 
 export function SiteFooter() {
   const pathname = usePathname();
-  // Dark marketing / auth / invite — no light footer (except docs, which are light).
-  if (
-    (isAppRoute(pathname) || isDarkMarketingPath(pathname)) &&
-    !isDocsPath(pathname)
-  ) {
+  // Dark marketing / auth / invite / docs / plans — no light footer.
+  // App chrome routes use their own shell.
+  if (isAppChromePath(pathname) || isDarkMarketingPath(pathname)) {
     return null;
   }
 

@@ -6,9 +6,11 @@ import { useState } from "react";
 import { MenuIcon, XIcon } from "lucide-react";
 
 import { LogoutButton } from "@/components/auth/logout-button";
-import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { Button } from "@/components/ui/button";
-import { isDarkMarketingPath } from "@/lib/layout/marketing-paths";
+import {
+  isAppChromePath,
+  isDarkMarketingPath,
+} from "@/lib/layout/marketing-paths";
 import { cn } from "@/lib/utils";
 
 type HeaderUser = { role: string } | null;
@@ -21,18 +23,6 @@ const publicLinks = [
   { href: "/terms", label: "Terms" },
 ] as const;
 
-
-function isAppRoute(pathname: string) {
-  return (
-    pathname.startsWith("/dashboard") ||
-    pathname.startsWith("/settings") ||
-    pathname.startsWith("/plans") ||
-    pathname.startsWith("/billing") ||
-    pathname.startsWith("/checkout") ||
-    pathname.startsWith("/admin")
-  );
-}
-
 export function SiteHeaderClient({ user }: { user: HeaderUser }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -44,7 +34,7 @@ export function SiteHeaderClient({ user }: { user: HeaderUser }) {
   }
 
   // App shell owns chrome on authenticated app routes.
-  if (user && isAppRoute(pathname)) {
+  if (user && isAppChromePath(pathname)) {
     return null;
   }
 
@@ -123,7 +113,6 @@ export function SiteHeaderClient({ user }: { user: HeaderUser }) {
         </div>
 
         <div className="flex items-center gap-4">
-          {!onDarkMarketing ? <ThemeToggle /> : null}
           {user ? (
             <>
               {onDarkMarketing ? (
@@ -131,10 +120,16 @@ export function SiteHeaderClient({ user }: { user: HeaderUser }) {
                   <Link href="/docs" className={cn(linkQuiet, "sm:hidden")}>
                     Docs
                   </Link>
-                  <Link href="/dashboard" className={cn(linkStrong, "hidden sm:inline")}>
+                  <Link
+                    href="/dashboard"
+                    className={cn(linkStrong, "hidden sm:inline")}
+                  >
                     Open desk
                   </Link>
-                  <Link href="/dashboard" className={cn(linkStrong, "sm:hidden")}>
+                  <Link
+                    href="/dashboard"
+                    className={cn(linkStrong, "sm:hidden")}
+                  >
                     Desk
                   </Link>
                   <LogoutButton

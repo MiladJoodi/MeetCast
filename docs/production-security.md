@@ -23,6 +23,10 @@ Never prefix secrets with `NEXT_PUBLIC_`. Never commit `.env.local`. Never expos
 
 Set `LIVEKIT_URL` at **build time** so production CSP `connect-src` can include the LiveKit origin. If unset, CSP falls back to broader `https:`/`wss:`.
 
+### Netlify secrets scanning
+
+Netlify may fail the deploy when it finds env values inside Next build output (`routes-manifest` for CSP, Turbopack cache). This repo’s `netlify.toml` sets `SECRETS_SCAN_OMIT_KEYS` / `SECRETS_SCAN_OMIT_PATHS` for those expected cases. Do not put secrets in `NEXT_PUBLIC_*` or client code.
+
 ## HTTPS and cookies
 
 - Serve the app only over HTTPS in production.
