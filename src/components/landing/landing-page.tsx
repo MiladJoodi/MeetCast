@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect } from "react";
 
 type LandingPageProps = {
@@ -19,7 +20,7 @@ const CAPABILITIES = [
 
 /**
  * Single-viewport marketing home — no scroll.
- * CTAs live in the transparent header; hero focuses on brand + capabilities.
+ * Primary CTA sits under the copy; mobile also pins it to the bottom.
  */
 export function LandingPage({ user }: LandingPageProps) {
   useEffect(() => {
@@ -42,6 +43,9 @@ export function LandingPage({ user }: LandingPageProps) {
     { name: "Riley", role: "", speaking: false, className: "mc-stage-tile mc-stage-d" },
   ] as const;
 
+  const primaryHref = user ? "/dashboard" : "/register";
+  const primaryLabel = user ? "Open desk" : "Start";
+
   return (
     <div className="mc-landing-lock relative isolate flex flex-1 flex-col overflow-hidden overscroll-none text-[var(--room-fg)]">
       <div aria-hidden className="pointer-events-none absolute inset-0">
@@ -59,7 +63,7 @@ export function LandingPage({ user }: LandingPageProps) {
         </div>
       </div>
 
-      <div className="relative z-10 mx-auto grid h-full w-full max-w-6xl flex-1 grid-cols-1 items-center gap-6 px-4 pb-6 pt-14 sm:gap-8 sm:px-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-10 lg:pb-8">
+      <div className="relative z-10 mx-auto grid h-full w-full max-w-6xl flex-1 grid-cols-1 items-center gap-6 px-4 pb-28 pt-14 sm:gap-8 sm:px-6 sm:pb-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-10 lg:pb-8">
         <div className="flex max-w-xl flex-col justify-center gap-4 lg:gap-5">
           <p className="mc-stage-brand text-[clamp(2rem,5vw,3.25rem)] font-semibold leading-none tracking-[-0.045em]">
             MeetCast
@@ -72,10 +76,7 @@ export function LandingPage({ user }: LandingPageProps) {
             <span className="mc-stage-rule block h-px w-16 bg-[color-mix(in_oklch,var(--live)_85%,white)]" />
             <p className="mc-stage-in-3 max-w-md text-sm leading-relaxed text-white/60">
               Schedule the window, share one invite, and meet — without a noisy
-              call UI.{" "}
-              {user
-                ? "Open your desk from the header when you’re ready."
-                : "Log in or start from the header."}
+              call UI.
             </p>
           </div>
 
@@ -95,11 +96,29 @@ export function LandingPage({ user }: LandingPageProps) {
               </li>
             ))}
           </ul>
+
+          {/* Desktop/tablet: CTA after copy. Mobile uses the bottom bar only. */}
+          <div className="mc-stage-in-3 hidden flex-col gap-2 sm:flex sm:flex-row sm:items-center sm:gap-3">
+            <Link
+              href={primaryHref}
+              className="inline-flex h-11 items-center justify-center rounded-lg bg-white px-6 text-[0.9375rem] font-semibold tracking-[-0.02em] text-black transition-opacity hover:opacity-90"
+            >
+              {primaryLabel}
+            </Link>
+            {!user ? (
+              <Link
+                href="/login"
+                className="text-sm font-medium text-white/70 transition-colors hover:text-white"
+              >
+                Log in
+              </Link>
+            ) : null}
+          </div>
         </div>
 
         <div
           aria-hidden
-          className="mc-stage-frame relative mx-auto w-full max-w-md lg:max-w-none"
+          className="mc-stage-frame relative mx-auto hidden w-full max-w-md sm:block lg:max-w-none"
         >
           <div className="mc-stage-glow" />
           <div className="relative overflow-hidden rounded-xl border border-white/12 bg-[color-mix(in_oklch,var(--room-chrome)_92%,black)] shadow-[0_30px_80px_-24px_oklch(0_0_0/0.65)]">
@@ -168,6 +187,25 @@ export function LandingPage({ user }: LandingPageProps) {
               </span>
             </div>
           </div>
+        </div>
+      </div>
+
+      <div className="mc-stage-mobile-cta pointer-events-none absolute inset-x-0 bottom-0 z-20 border-t border-white/10 bg-black/80 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] backdrop-blur-md sm:hidden">
+        <div className="pointer-events-auto mx-auto flex w-full max-w-md flex-col gap-2">
+          <Link
+            href={primaryHref}
+            className="mc-stage-mobile-cta-btn flex h-12 items-center justify-center rounded-lg bg-white text-[0.9375rem] font-semibold tracking-[-0.02em] text-black transition-opacity hover:opacity-90"
+          >
+            {primaryLabel}
+          </Link>
+          {!user ? (
+            <Link
+              href="/login"
+              className="flex h-10 items-center justify-center text-sm font-medium text-white/70 transition-colors hover:text-white"
+            >
+              Log in
+            </Link>
+          ) : null}
         </div>
       </div>
     </div>

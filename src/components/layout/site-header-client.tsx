@@ -56,10 +56,12 @@ export function SiteHeaderClient({ user }: { user: HeaderUser }) {
   return (
     <header
       className={cn(
-        "z-40",
+        "z-50",
         onDarkMarketing
-          ? "pointer-events-none fixed inset-x-0 top-0 border-0 bg-transparent text-white"
+          ? "pointer-events-none fixed inset-x-0 top-0 border-0 text-white"
           : "sticky top-0 border-b border-border bg-background text-foreground",
+        onDarkMarketing &&
+          (open ? "bg-black/95 backdrop-blur-md" : "bg-transparent"),
       )}
     >
       <div
@@ -191,14 +193,18 @@ export function SiteHeaderClient({ user }: { user: HeaderUser }) {
           className={cn(
             "pointer-events-auto grid overflow-hidden transition-[grid-template-rows,opacity] duration-300 ease-out md:hidden",
             open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0",
+            open &&
+              (onDarkMarketing
+                ? "border-b border-white/15 bg-black"
+                : "border-b border-border bg-background shadow-sm"),
           )}
         >
-          <div className="min-h-0 overflow-hidden">
+          <div className="min-h-0 overflow-hidden bg-inherit">
             <nav
               className={cn(
                 "flex flex-col gap-0.5 py-3",
                 onDarkMarketing
-                  ? "mx-auto w-full max-w-6xl px-4 sm:px-6"
+                  ? "mx-auto w-full max-w-6xl bg-black px-4 sm:px-6"
                   : "mc-shell",
               )}
               aria-label="Mobile"
