@@ -28,7 +28,7 @@ export function PlansOverview({
 
   return (
     <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-      {plans.map((plan) => {
+      {plans.map((plan, index) => {
         const isCurrent = isCurrentUserPlan(plan, currentPlanId);
         const durationNote = formatPlanDurationNote(plan);
 
@@ -38,13 +38,18 @@ export function PlansOverview({
             className={cn(
               "flex flex-col gap-4 rounded-xl p-5",
               marketing
-                ? "border border-white/12 bg-[color-mix(in_oklch,var(--room-chrome)_88%,black)]"
+                ? "mc-mkt-card border border-white/12 bg-[color-mix(in_oklch,var(--room-chrome)_88%,black)]"
                 : "border border-border/80 bg-surface-elevated",
               isCurrent &&
                 (marketing
-                  ? "border-[color-mix(in_oklch,var(--live)_55%,white)]/40"
+                  ? "mc-mkt-card-current border-[color-mix(in_oklch,var(--live)_55%,white)]/40"
                   : "border-brand/30 bg-brand-soft/25"),
             )}
+            style={
+              marketing
+                ? { animationDelay: `${0.22 + index * 0.07}s` }
+                : undefined
+            }
           >
             <div className="space-y-1">
               <div className="flex items-start justify-between gap-2">

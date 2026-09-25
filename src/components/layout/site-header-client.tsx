@@ -6,11 +6,13 @@ import { useState } from "react";
 import { MenuIcon, XIcon } from "lucide-react";
 
 import { LogoutButton } from "@/components/auth/logout-button";
+import { GitHubIcon } from "@/components/icons/github-icon";
 import { Button } from "@/components/ui/button";
 import {
   isAppChromePath,
   isDarkMarketingPath,
 } from "@/lib/layout/marketing-paths";
+import { SITE_SOCIAL } from "@/lib/site/links";
 import { cn } from "@/lib/utils";
 
 type HeaderUser = { role: string } | null;
@@ -114,7 +116,21 @@ export function SiteHeaderClient({ user }: { user: HeaderUser }) {
           </nav>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 sm:gap-4">
+          <a
+            href={SITE_SOCIAL.github.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={cn(
+              "inline-flex size-8 items-center justify-center rounded-md transition-colors",
+              onDarkMarketing
+                ? "text-white/70 hover:bg-white/10 hover:text-white"
+                : "text-muted-foreground hover:bg-muted hover:text-foreground",
+            )}
+            aria-label="MeetCast on GitHub"
+          >
+            <GitHubIcon className="size-4.5" />
+          </a>
           {user ? (
             <>
               {onDarkMarketing ? (
@@ -222,6 +238,19 @@ export function SiteHeaderClient({ user }: { user: HeaderUser }) {
                   {link.label}
                 </Link>
               ))}
+              <a
+                href={SITE_SOCIAL.github.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={cn(
+                  "inline-flex items-center gap-2 py-2 text-sm",
+                  onDarkMarketing ? "text-white/85" : undefined,
+                )}
+                onClick={() => setOpen(false)}
+              >
+                <GitHubIcon className="size-4" />
+                GitHub
+              </a>
               <div
                 className={cn(
                   "mt-2 flex flex-col gap-1 pt-3",

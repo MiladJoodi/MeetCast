@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Source_Sans_3 } from "next/font/google";
 
 import { AccentProvider } from "@/components/layout/accent-provider";
+import { MarketingCanvasSync } from "@/components/layout/marketing-canvas-sync";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { ThemeProvider } from "@/components/layout/theme-provider";
@@ -45,6 +46,7 @@ export default function RootLayout({
       <body className="flex min-h-full flex-col overflow-x-clip font-sans">
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
           <AccentProvider>
+            <MarketingCanvasSync />
             <SiteHeader />
             <main className="flex min-w-0 flex-1 flex-col">{children}</main>
             <SiteFooter />

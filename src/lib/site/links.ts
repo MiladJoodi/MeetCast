@@ -1,7 +1,7 @@
-/** Public profile links used in footer / contact. */
+/** Public profile / project links used in chrome, footer, contact. */
 export const SITE_SOCIAL = {
   github: {
-    href: "https://github.com/MiladJoodi",
+    href: "https://github.com/MiladJoodi/MeetCast",
     label: "GitHub",
   },
   linkedin: {

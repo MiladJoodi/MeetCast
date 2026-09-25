@@ -7,10 +7,11 @@ type DocsPageProps = {
 export function DocsPage({ title, description, children }: DocsPageProps) {
   return (
     <div className="space-y-8">
-      <header className="space-y-2 border-b border-white/10 pb-6">
-        <h1 className="text-[1.75rem] font-semibold tracking-[-0.03em] text-white sm:text-[2rem]">
+      <header className="space-y-3 pb-6">
+        <h1 className="text-[clamp(1.75rem,4vw,2.35rem)] font-semibold leading-[1.12] tracking-[-0.04em] text-white text-balance">
           {title}
         </h1>
+        <span className="mc-mkt-rule block h-px w-14 bg-[color-mix(in_oklch,var(--live)_85%,white)]" />
         <p className="max-w-2xl text-sm leading-relaxed text-white/55 sm:text-[0.9375rem]">
           {description}
         </p>

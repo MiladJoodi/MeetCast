@@ -29,12 +29,13 @@ export function CodeBlock({ code, language, className }: CodeBlockProps) {
   return (
     <div
       className={cn(
-        "group relative overflow-hidden rounded-lg border border-white/12 bg-[color-mix(in_oklch,var(--room-chrome)_88%,black)]",
+        "mc-mkt-panel group relative overflow-hidden rounded-xl border border-white/12 bg-[color-mix(in_oklch,var(--room-chrome)_88%,black)]",
         className,
       )}
     >
       <div className="flex items-center justify-between gap-2 border-b border-white/10 px-3 py-1.5">
-        <span className="text-[0.6875rem] font-medium tracking-wide text-white/45 uppercase">
+        <span className="flex items-center gap-2 text-[0.6875rem] font-medium tracking-wide text-white/45 uppercase">
+          <span className="mc-mkt-live scale-75" aria-hidden />
           {language ?? "code"}
         </span>
         <Button

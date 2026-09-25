@@ -307,6 +307,78 @@ export async function loginAction(
   redirect(nextPath ?? "/dashboard");
 }
 
+/** Public landing “Try demo” — credentials stay server-side. */
+const DEMO_LOGIN_EMAIL = "admin@webinari.ir";
+const DEMO_LOGIN_PASSWORD = "12345678";
+
+export async function demoLoginAction(
+  _prevState: AuthActionState,
+  _formData: FormData,
+): Promise<AuthActionState> {
+  const invalidDemo: AuthActionState = {
+    ok: false,
+    message: "Demo account isn’t available right now. Try again shortly.",
+  };
+
+  try {
+    await assertLoginRateLimits(DEMO_LOGIN_EMAIL);
+
+    const rows = await db
+      .select({
+        id: users.id,
+        passwordHash: users.passwordHash,
+        blockedAt: users.blockedAt,
+      })
+      .from(users)
+      .where(eq(users.email, DEMO_LOGIN_EMAIL))
+      .limit(1);
+
+    const user = rows[0];
+    if (!user) {
+      await verifyPassword(TIMING_DUMMY_PASSWORD_HASH, DEMO_LOGIN_PASSWORD);
+      logger.info("auth.demo_login_failed", { reason: "missing_user" });
+      return invalidDemo;
+    }
+
+    const passwordValid = await verifyPassword(
+      user.passwordHash,
+      DEMO_LOGIN_PASSWORD,
+    );
+    if (!passwordValid) {
+      logger.info("auth.demo_login_failed", {
+        reason: "bad_password",
+        userId: user.id,
+      });
+      return invalidDemo;
+    }
+
+    if (user.blockedAt) {
+      logger.info("auth.demo_login_failed", {
+        reason: "blocked",
+        userId: user.id,
+      });
+      return invalidDemo;
+    }
+
+    await createSession(user.id);
+    logger.info("auth.demo_login_success", { userId: user.id });
+  } catch (error) {
+    if (error instanceof AppError && error.code === "RATE_LIMITED") {
+      return {
+        ok: false,
+        message: "Too many attempts. Wait a moment, then try demo again.",
+      };
+    }
+
+    logger.error("auth.demo_login_failed", {
+      error: error instanceof Error ? error.name : "unknown",
+    });
+    return invalidDemo;
+  }
+
+  redirect("/dashboard");
+}
+
 export async function logoutAction(): Promise<void> {
   try {
     await invalidateCurrentSession();

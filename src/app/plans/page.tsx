@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { MarketingShell } from "@/components/layout/marketing-shell";
+import { MarketingPageHeader } from "@/components/marketing/marketing-page-header";
+import { MarketingTourNav } from "@/components/marketing/marketing-tour-nav";
 import { EmptyState } from "@/components/meetcast/empty-state";
 import { PlansComparisonTable } from "@/components/plans/plans-comparison-table";
 import { PlansOverview } from "@/components/plans/plans-overview";
@@ -39,23 +41,21 @@ export default async function PlansPage() {
   return (
     <MarketingShell
       scrollable
-      className="max-w-5xl gap-8 pb-20 pt-20 sm:pt-24"
+      className="max-w-5xl gap-10 pb-20 pt-20 sm:pt-24"
     >
-      <header className="space-y-3">
-        <p className="text-sm font-medium text-white/50">Plans</p>
-        <h1 className="text-[clamp(1.75rem,4vw,2.35rem)] font-semibold tracking-[-0.04em] text-white">
-          Pick the room size you need.
-        </h1>
-        <p className="max-w-xl text-sm leading-relaxed text-white/55">
-          {currentPlan
+      <MarketingPageHeader
+        eyebrow="Capacity"
+        title="Pick the room size you need."
+        description={
+          currentPlan
             ? `You’re on ${currentPlan.name}. Limits update when you order another plan.`
-            : "Compare participants and meeting length. Order after you sign in."}
-        </p>
-      </header>
+            : "Compare participants and meeting length. Order after you sign in — browsing here needs no account."
+        }
+      />
 
       {loadError ? (
         <EmptyState
-          className="text-white [&_.text-muted-foreground]:text-white/55"
+          className="mc-mkt-in-4 text-white [&_.text-muted-foreground]:text-white/55"
           title="Unable to load plans"
           description="Try again in a moment."
           action={
@@ -70,26 +70,40 @@ export default async function PlansPage() {
         />
       ) : activePlans.length === 0 ? (
         <EmptyState
-          className="text-white [&_.text-muted-foreground]:text-white/55"
+          className="mc-mkt-in-4 text-white [&_.text-muted-foreground]:text-white/55"
           title="No active plans"
           description="Nothing to compare right now."
         />
       ) : (
-        <div className="space-y-10">
+        <div className="space-y-12">
           <PlansOverview
             plans={activePlans}
             currentPlanId={currentPlan?.id}
             signedIn={Boolean(user)}
             tone="marketing"
           />
-          <PlansComparisonTable
-            plans={activePlans}
-            currentPlanId={currentPlan?.id}
-            signedIn={Boolean(user)}
-            tone="marketing"
-          />
+          <div className="mc-mkt-section space-y-4" style={{ animationDelay: "0.45s" }}>
+            <div className="flex items-end justify-between gap-4">
+              <div>
+                <p className="text-[0.6875rem] font-medium tracking-[0.12em] text-white/40 uppercase">
+                  Side by side
+                </p>
+                <h2 className="mt-1 text-lg font-semibold tracking-[-0.03em] text-white">
+                  Full comparison
+                </h2>
+              </div>
+            </div>
+            <PlansComparisonTable
+              plans={activePlans}
+              currentPlanId={currentPlan?.id}
+              signedIn={Boolean(user)}
+              tone="marketing"
+            />
+          </div>
         </div>
       )}
+
+      <MarketingTourNav current="/plans" />
     </MarketingShell>
   );
 }

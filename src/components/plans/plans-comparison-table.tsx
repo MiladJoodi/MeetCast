@@ -84,14 +84,11 @@ export function PlansComparisonTable({
 
   return (
     <section className="space-y-3">
-      <h2
-        className={cn(
-          "text-sm font-medium",
-          marketing ? "text-white/50" : "text-muted-foreground",
-        )}
-      >
-        Full comparison
-      </h2>
+      {marketing ? null : (
+        <h2 className="text-sm font-medium text-muted-foreground">
+          Full comparison
+        </h2>
+      )}
 
       {/* Mobile */}
       <div className="space-y-3 md:hidden">
@@ -103,13 +100,18 @@ export function PlansComparisonTable({
               className={cn(
                 "overflow-hidden rounded-xl border",
                 marketing
-                  ? "border-white/12 bg-[color-mix(in_oklch,var(--room-chrome)_88%,black)]"
+                  ? "mc-mkt-card border-white/12 bg-[color-mix(in_oklch,var(--room-chrome)_88%,black)]"
                   : "border-border/80 bg-surface-elevated",
                 isCurrent &&
                   (marketing
-                    ? "border-[color-mix(in_oklch,var(--live)_55%,white)]/40"
+                    ? "mc-mkt-card-current border-[color-mix(in_oklch,var(--live)_55%,white)]/40"
                     : "border-brand/30 bg-brand-soft/25"),
               )}
+              style={
+                marketing
+                  ? { animationDelay: `${0.5 + planIndex * 0.06}s` }
+                  : undefined
+              }
             >
               <div
                 className={cn(
@@ -228,8 +230,11 @@ export function PlansComparisonTable({
       <div
         className={cn(
           "hidden overflow-x-auto overflow-y-hidden overscroll-x-contain rounded-xl border md:block",
-          marketing ? "border-white/12" : "border-border/80",
+          marketing
+            ? "mc-mkt-section border-white/12 bg-[color-mix(in_oklch,var(--room-chrome)_70%,black)]"
+            : "border-border/80",
         )}
+        style={marketing ? { animationDelay: "0.55s" } : undefined}
       >
         <table className="w-full min-w-[40rem] border-collapse text-left text-sm">
           <thead>

@@ -1,8 +1,36 @@
 import Link from "next/link";
+import { ArrowRight, BookOpen, Layers, Radio, Wrench } from "lucide-react";
 
 import { CodeBlock } from "@/components/docs/code-block";
 import { DocsCallout } from "@/components/docs/docs-callout";
 import { DocsPage } from "@/components/docs/docs-page";
+
+const START = [
+  {
+    href: "/docs/getting-started",
+    label: "Getting started",
+    blurb: "Install, env, migrate, run",
+    icon: BookOpen,
+  },
+  {
+    href: "/docs/architecture",
+    label: "Architecture",
+    blurb: "How the pieces connect",
+    icon: Layers,
+  },
+  {
+    href: "/docs/meetings",
+    label: "Meetings",
+    blurb: "Public/private rooms & invites",
+    icon: Radio,
+  },
+  {
+    href: "/docs/troubleshooting",
+    label: "Troubleshooting",
+    blurb: "Common local issues",
+    icon: Wrench,
+  },
+] as const;
 
 export default function DocsOverviewPage() {
   return (
@@ -24,26 +52,37 @@ export default function DocsOverviewPage() {
         </p>
       </section>
 
-      <section className="space-y-3">
+      <section className="space-y-4">
         <h2>Start here</h2>
-        <ul>
-          <li>
-            <Link href="/docs/getting-started">Getting started</Link> — install,
-            env, migrate, run
-          </li>
-          <li>
-            <Link href="/docs/architecture">Architecture</Link> — how the pieces
-            connect
-          </li>
-          <li>
-            <Link href="/docs/meetings">Meetings</Link> — public/private rooms
-            and invites
-          </li>
-          <li>
-            <Link href="/docs/troubleshooting">Troubleshooting</Link> — common
-            local issues
-          </li>
-        </ul>
+        <div className="not-prose grid gap-3 sm:grid-cols-2">
+          {START.map((item, index) => {
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="mc-mkt-card group flex flex-col gap-3 rounded-xl border border-white/12 bg-[color-mix(in_oklch,var(--room-chrome)_88%,black)] p-4 no-underline!"
+                style={{ animationDelay: `${0.2 + index * 0.06}s` }}
+              >
+                <span className="flex size-9 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-white/80 transition-colors group-hover:border-white/20 group-hover:text-white">
+                  <Icon className="size-4" strokeWidth={1.75} aria-hidden />
+                </span>
+                <span className="space-y-1">
+                  <span className="flex items-center gap-1.5 text-sm font-semibold tracking-[-0.02em] text-white">
+                    {item.label}
+                    <ArrowRight
+                      className="size-3.5 text-white/35 transition-transform group-hover:translate-x-0.5 group-hover:text-white/70"
+                      aria-hidden
+                    />
+                  </span>
+                  <span className="block text-xs leading-relaxed text-white/45">
+                    {item.blurb}
+                  </span>
+                </span>
+              </Link>
+            );
+          })}
+        </div>
       </section>
 
       <section className="space-y-3">

@@ -20,17 +20,21 @@ export function MarketingShell({
     <div
       className={cn(
         "mc-invite-page relative isolate flex w-full min-w-0 flex-col text-[var(--room-fg)]",
-        // overflow-x-hidden forces overflow-y:auto → double scrollbar. Prefer clip.
-        // scrollable pages size to content (body scrolls once); locked pages fill + clip.
+        // overflow-x-hidden forces overflow-y:auto → double scrollbar.
+        // Scrollable pages must grow with content (not flex-lock to viewport).
         scrollable
-          ? "overflow-x-clip"
+          ? "min-h-dvh overflow-x-clip"
           : "min-h-0 flex-1 overflow-hidden",
       )}
     >
-      <div aria-hidden className="pointer-events-none absolute inset-0">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 overflow-hidden"
+      >
         <div className="mc-stage-aura mc-stage-aura-1" />
         <div className="mc-stage-aura mc-stage-aura-2" />
-        <div className="mc-stage-grid opacity-[0.08]" />
+        <div className="mc-stage-grid opacity-[0.1]" />
+        <div className="mc-mkt-scan" />
       </div>
       <div
         className={cn(

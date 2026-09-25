@@ -16,7 +16,7 @@ export function DocsCallout({
   return (
     <aside
       className={cn(
-        "rounded-lg border px-4 py-3 text-sm leading-relaxed",
+        "mc-mkt-panel rounded-xl border px-4 py-3.5 text-sm leading-relaxed",
         variant === "warning"
           ? "border-amber-400/35 bg-amber-400/10 text-white"
           : "border-white/12 bg-white/5 text-white",
