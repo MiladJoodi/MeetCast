@@ -140,7 +140,7 @@ export function LandingPage({ user }: LandingPageProps) {
       <div className="relative z-10 mx-auto grid h-full w-full max-w-6xl flex-1 grid-cols-1 items-center gap-6 px-4 pb-36 pt-14 sm:gap-8 sm:px-6 sm:pb-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-10 lg:pb-8">
         <div className="flex max-w-xl flex-col justify-center gap-4 lg:gap-5">
           <p className="mc-stage-brand text-[clamp(2rem,5vw,3.25rem)] font-semibold leading-none tracking-[-0.045em]">
-            MeetCast
+            Webinari
           </p>
 
           <div className="space-y-2.5">
