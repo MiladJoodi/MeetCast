@@ -59,16 +59,6 @@ In-app docs (after `pnpm dev`): open `/docs` on your local app.
 
 ---
 
-## Screenshots
-
-No screenshot assets are checked into the repo yet. When you add them, drop images under `docs/screenshots/` and link them here, for example:
-
-```md
-![Landing](docs/screenshots/landing.png)
-![Dashboard](docs/screenshots/dashboard.png)
-![Meeting](docs/screenshots/meeting.png)
-```
-
 Suggested captures: landing, dashboard, rooms, live meeting, plans, private room settings, admin, account settings.
 
 ---
