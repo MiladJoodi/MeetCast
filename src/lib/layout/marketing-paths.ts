@@ -31,3 +31,17 @@ export function isAppChromePath(pathname: string): boolean {
     pathname.startsWith("/admin")
   );
 }
+
+/** Live meeting UI owns its own chrome — hide the global site header/footer. */
+export function isMeetingRoomPath(pathname: string): boolean {
+  return pathname.startsWith("/room/");
+}
+
+/** Paths where the root SiteHeader must not render. */
+export function hidesSiteHeader(
+  pathname: string,
+  signedIn: boolean,
+): boolean {
+  if (isMeetingRoomPath(pathname)) return true;
+  return signedIn && isAppChromePath(pathname);
+}

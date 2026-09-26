@@ -9,7 +9,7 @@ import { LogoutButton } from "@/components/auth/logout-button";
 import { GitHubStarsLink } from "@/components/layout/github-stars-link";
 import { Button } from "@/components/ui/button";
 import {
-  isAppChromePath,
+  hidesSiteHeader,
   isDarkMarketingPath,
 } from "@/lib/layout/marketing-paths";
 import { cn } from "@/lib/utils";
@@ -34,8 +34,8 @@ export function SiteHeaderClient({ user }: { user: HeaderUser }) {
     setOpen(false);
   }
 
-  // App shell owns chrome on authenticated app routes.
-  if (user && isAppChromePath(pathname)) {
+  // App shell / live meeting own their chrome.
+  if (hidesSiteHeader(pathname, Boolean(user))) {
     return null;
   }
 

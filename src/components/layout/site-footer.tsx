@@ -6,14 +6,19 @@ import { usePathname } from "next/navigation";
 import {
   isAppChromePath,
   isDarkMarketingPath,
+  isMeetingRoomPath,
 } from "@/lib/layout/marketing-paths";
 import { SITE_SOCIAL } from "@/lib/site/links";
 
 export function SiteFooter() {
   const pathname = usePathname();
   // Dark marketing / auth / invite / docs / plans — no light footer.
-  // App chrome routes use their own shell.
-  if (isAppChromePath(pathname) || isDarkMarketingPath(pathname)) {
+  // App chrome + live meeting use their own shell.
+  if (
+    isAppChromePath(pathname) ||
+    isDarkMarketingPath(pathname) ||
+    isMeetingRoomPath(pathname)
+  ) {
     return null;
   }
 
