@@ -24,13 +24,7 @@ const publicLinks = [
   { href: "/terms", label: "Terms" },
 ] as const;
 
-export function SiteHeaderClient({
-  user,
-  githubStars,
-}: {
-  user: HeaderUser;
-  githubStars: number | null;
-}) {
+export function SiteHeaderClient({ user }: { user: HeaderUser }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [pathForOpen, setPathForOpen] = useState(pathname);
@@ -122,10 +116,7 @@ export function SiteHeaderClient({
         </div>
 
         <div className="flex items-center gap-2.5 sm:gap-3">
-          <GitHubStarsLink
-            stars={githubStars}
-            tone={onDarkMarketing ? "dark" : "light"}
-          />
+          <GitHubStarsLink tone={onDarkMarketing ? "dark" : "light"} />
           {user ? (
             <>
               {onDarkMarketing ? (
@@ -177,7 +168,7 @@ export function SiteHeaderClient({
               ) : null}
               {showRegisterCta ? (
                 <Link href="/register" className={linkStrong}>
-                  Start
+                  Create account
                 </Link>
               ) : null}
             </div>
@@ -190,7 +181,7 @@ export function SiteHeaderClient({
               ) : null}
               {showRegisterCta ? (
                 <Button size="sm" asChild>
-                  <Link href="/register">Start</Link>
+                  <Link href="/register">Create account</Link>
                 </Button>
               ) : null}
             </div>
@@ -235,7 +226,6 @@ export function SiteHeaderClient({
               ))}
               <div className="py-2">
                 <GitHubStarsLink
-                  stars={githubStars}
                   tone={onDarkMarketing ? "dark" : "light"}
                   className="w-fit"
                 />
@@ -265,7 +255,7 @@ export function SiteHeaderClient({
                         className="py-2 text-sm font-semibold text-white"
                         onClick={() => setOpen(false)}
                       >
-                        Start
+                        Create account
                       </Link>
                     ) : null}
                   </>
@@ -286,7 +276,7 @@ export function SiteHeaderClient({
                     {showRegisterCta ? (
                       <Button size="sm" className="w-full" asChild>
                         <Link href="/register" onClick={() => setOpen(false)}>
-                          Start
+                          Create account
                         </Link>
                       </Button>
                     ) : null}

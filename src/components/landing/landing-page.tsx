@@ -108,7 +108,7 @@ export function LandingPage({ user }: LandingPageProps) {
   }, []);
 
   const primaryHref = user ? "/dashboard" : "/register";
-  const primaryLabel = user ? "Open desk" : "Start";
+  const primaryLabel = user ? "Open desk" : "Create account";
   const chat = CHAT_LINES[chatIndex];
 
   return (

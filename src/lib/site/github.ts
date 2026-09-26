@@ -1,11 +1,13 @@
-import { SITE_SOCIAL } from "@/lib/site/links";
+import { GITHUB_REPO_SLUG } from "@/lib/site/github-shared";
 
-/** `owner/repo` parsed from the public GitHub project URL. */
-export const GITHUB_REPO_SLUG = "MiladJoodi/MeetCast" as const;
+export {
+  GITHUB_REPO_SLUG,
+  formatStarCount,
+  githubRepoUrl,
+} from "@/lib/site/github-shared";
 
-export function githubRepoUrl(): string {
-  return SITE_SOCIAL.github.href;
-}
+/** Never let GitHub hang longer than this. */
+const GITHUB_FETCH_TIMEOUT_MS = 2000;
 
 /**
  * Cached GitHub star count for the header badge.
@@ -21,6 +23,7 @@ export async function getGithubStarCount(): Promise<number | null> {
           "User-Agent": "MeetCast",
         },
         next: { revalidate: 3600 },
+        signal: AbortSignal.timeout(GITHUB_FETCH_TIMEOUT_MS),
       },
     );
 
@@ -33,12 +36,4 @@ export async function getGithubStarCount(): Promise<number | null> {
   } catch {
     return null;
   }
-}
-
-export function formatStarCount(count: number): string {
-  if (count >= 1000) {
-    const k = count / 1000;
-    return `${k >= 10 ? Math.round(k) : Math.round(k * 10) / 10}k`;
-  }
-  return String(count);
 }

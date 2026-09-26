@@ -1,26 +1,55 @@
+"use client";
+
 import { Star } from "lucide-react";
+import { useEffect, useState } from "react";
 
 import { GitHubIcon } from "@/components/icons/github-icon";
-import {
-  formatStarCount,
-  githubRepoUrl,
-} from "@/lib/site/github";
+import { formatStarCount, githubRepoUrl } from "@/lib/site/github-shared";
 import { cn } from "@/lib/utils";
 
 type GitHubStarsLinkProps = {
-  stars: number | null;
   tone?: "dark" | "light";
   className?: string;
   /** Compact icon+count for tight header slots */
   compact?: boolean;
 };
 
+/**
+ * Renders immediately; star count loads after paint so GitHub never blocks LCP.
+ */
 export function GitHubStarsLink({
-  stars,
   tone = "dark",
   className,
   compact = false,
 }: GitHubStarsLinkProps) {
+  const [stars, setStars] = useState<number | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    const ctrl = new AbortController();
+    const timer = window.setTimeout(() => ctrl.abort(), 2500);
+
+    fetch("/api/github-stars", { signal: ctrl.signal })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: { stars?: unknown } | null) => {
+        if (cancelled) return;
+        if (typeof data?.stars === "number") setStars(data.stars);
+      })
+      .catch(() => {
+        /* badge stays without a count */
+      })
+      .finally(() => {
+        window.clearTimeout(timer);
+      });
+
+    return () => {
+      cancelled = true;
+      ctrl.abort();
+      window.clearTimeout(timer);
+    };
+  }, []);
+
+  const countLabel = stars === null ? "—" : formatStarCount(stars);
   const label =
     stars === null
       ? "Star MeetCast on GitHub"
@@ -43,7 +72,8 @@ export function GitHubStarsLink({
       )}
     >
       <GitHubIcon className="size-3.5 shrink-0" />
-      {!compact ? <span className="hidden sm:inline">Star</span> : null}
+      {/* Keep descriptive link text in the DOM (Lighthouse SEO). */}
+      <span className={cn(!compact && "hidden sm:inline")}>Star MeetCast</span>
       <span
         className={cn(
           "inline-flex items-center gap-0.5",
@@ -57,7 +87,7 @@ export function GitHubStarsLink({
           )}
           aria-hidden
         />
-        {stars === null ? "—" : formatStarCount(stars)}
+        {countLabel}
       </span>
     </a>
   );
